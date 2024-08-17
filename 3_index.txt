@@ -1,0 +1,55 @@
+***index***
+Indexes in MongoDB are data structures that store a small portion of the collection’s 
+data in an easy-to-traverse form. They improve query performance by allowing MongoDB
+to quickly locate documents based on the indexed fields. MongoDB supports various 
+types of indexes, including single field, compound, multikey, geospatial, and text indexes.
+
+without indexs
+->Mongodb reads all documents  (collection scan)
+->sorts results in memory
+
+with indexes
+->mongodb only fetches the documents indentified by the index based on the query
+->returns results faster
+
+
+->if we insert or update documents , we need to update the index data structure
+
+most common index types:
+1->single field index- on single field 
+2->compound field index-on multiple fields
+
+***create index***
+
+db.customers.createIndex({email:1}) // 1->ascending
+db.customers.createIndex({birthdate:1},{unique:true}); //unique will tell mongodb to not
+//allow any duplicate insert documents
+
+db.customers.getIndexes()
+db.customers.dropIndex({birthdate:1},{unique:true});  OR db.customers.dropIndex("birthdate_1" )
+.hideInde()
+.dropIndexes()
+
+***compound index
+
+MongoDB can use the index to support queries that include a "prefix" of the indexed fields.
+For example, if you have a compound index on { "grade": 1, "age": -1 }, it can be used for:
+1->Queries on grade only.
+2->Queries on both grade and age.
+3->It cannot be used for queries on age only or in combination with other fields that are 
+not a prefix.
+
+Example: Valid Queries Using the Index:
+
+db.students.find({ "grade": "A" })  // Uses the "grade" part of the index
+db.students.find({ "grade": "A", "age": { $gte: 15 } })  // Uses both "grade" and "age"
+
+Invalid Query for the Index:
+
+db.students.find({ "age": { $gte: 15 } })  // Cannot use the index, as it does not include "grade
+
+***disadvantages of index-:
+1->indexes have a write cost , need to update indexes after every update/insert/delete opration
+
+NOTE->use .explain() to know about the execution of queries and check wheather
+the query is scanning all documents or  using index

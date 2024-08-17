@@ -1,0 +1,16 @@
+step1-start the transaction
+const session=db.getMongo().startSession();
+session.startTransaction()
+
+step2- decreate the balance ( sent money)
+const account=session.getDatabase('bank').getCollection("accounts");
+account.updateOne({account_id:"########"},{#inc: {balance:-30 }}); 
+
+step3- increase the balance ( recieved money)
+account.updateOne({account_id:"########"},{#inc: {balance:30 }}); 
+
+step4- commit the transaction to update in database (trans. complete)
+session.commitTransaction()
+
+step#- if transaction is aborted by any means
+session.abortTransaction()

@@ -42,3 +42,7 @@ monshell is a node.js repple environment allow to use varaibles,loops,statemnts,
 1.open mongodb compass 
 2.(paste the connection string in compass URI received from atlas->database->connect cluster ->compass->i have shell installed)
 3. replace <password> with your password and connect
+
+***connect mongodb atlas through your application i.e. server field
+1.use sample code snippet provided by atlas (db->connect->driver) in you server.js
+2.replace <password> with your password

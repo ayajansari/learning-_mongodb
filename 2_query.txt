@@ -1,0 +1,103 @@
+***sort***
+//to sort documents having code:"music"  in ascending order according to name (i.e 1 is for ascending and -1 for descending)
+db.collection.find({category_code:"music"}).sort({name:1})
+
+***projection***
+if document is containing to many fields then we can specify field to show only.
+db.collection.find({category_code:"music"},{name:1}).sort({name:1});
+//here we only get document _id field and name field in ascending order of name
+
+***limits***
+//to get top 3 documents with highest employees 
+db.collection.find({category_code:"music"}).sort({name:1}).limits(3);
+db.collection.find({category_code:"music"},{name:1,no_of_employess:1}).sort({name:1}).limits(3); //added projection
+//so that _id , name and no_of_employess fields will be there in documents 
+//we can exclude _id fiels by adding _id:0 to projection list
+
+***count***
+db.collection.countDocuments({tripduration:{$gt:120} , usertype:"subscriber"})
+
+***aggregation pipeline***
+
+db.zips.aggregate([ 
+
+    { 
+        $match:{ "state":"CA"}  //output of this will be given to group 
+    }, 
+    {
+        $group:{
+            _id:"$city",    //group_key
+            totalZips:{ $count:{}}
+        }
+    }
+])
+
+***sort***
+
+ db.zips.aggregate([
+    {
+       $sort:{ pop:-1}  //descending order by pop 
+    },
+    {
+        $project:{ pop:1 } //add projection (1->to include 0->to exclude)
+    },
+    {
+        $limit:5 //top 5 documents
+    }
+])
+
+*** set ***
+
+db.zips.aggregate([ 
+    { 
+        $set:{ 
+            population_2022:{
+                $round:{ 
+                    $multiply:[ 1.003,"$pop"]
+                }
+            }
+        }
+    }
+]);
+
+***count***
+ db.zips.aggregate([ 
+    { 
+        $count:"total_zips"  //gives o/p: total_zips:2344 
+        //count total no. of documents
+    }
+])
+
+***out***  
+//to write the output documents into a new collection use  $out
+
+db.zips.aggregate([
+    { 
+        $group: { 
+            _id: "$state", 
+            total_pop: { 
+                $sum: "$pop" 
+            } 
+        } 
+    }, 
+    { 
+        $match: { 
+            total_pop: { $lt: 1000000 } 
+        } 
+    },
+    {
+        $out : "small_states"   //all output documents will be stored in small_states collection
+    }
+])
+
+output->   [
+                { _id: 'SD', total_pop: 696004 },
+                { _id: 'DC', total_pop: 606900 },
+                { _id: 'DE', total_pop: 666168 },
+                { _id: 'AK', total_pop: 550043 },
+                { _id: 'VT', total_pop: 562758 },
+                { _id: 'MT', total_pop: 799065 },
+                { _id: 'ND', total_pop: 638800 },
+                { _id: 'WY', total_pop: 453588 }
+            ]
+
